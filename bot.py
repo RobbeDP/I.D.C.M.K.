@@ -17,7 +17,7 @@ import logging
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 
-from image_fetch import HoodieFetcher
+from image_fetch import ImgurFetcher
 
 from configparser import ConfigParser
 
@@ -35,7 +35,7 @@ config.read('./idcmk.ini')
 # Initialize hoodie fetcher
 CLIENT_ID = config['imgur']['client_id']
 CLIENT_SECRET = config['imgur']['client_secret']
-hoodie_fetcher = HoodieFetcher(CLIENT_ID, CLIENT_SECRET)
+imgur_fetcher = ImgurFetcher(CLIENT_ID, CLIENT_SECRET)
 
 # Read in Telegram Bot Token
 BOT_TOKEN = config['telegram']['token']
@@ -49,13 +49,20 @@ def start(update, context):
 
 def help(update, context):
     """Send a message when the command /help is issued."""
-    update.message.reply_text('Help!')
+    update.message.reply_text('opbokken kut zoek het zelf maar uit')
 
 
 def trui(update, context):
-    if update.message.text == 'trui':
-        update.message.reply_text('trui')
+    message = update.message
+    if hasattr(message, 'text'):
+        link = None
+        if message.text == 'trui':
+            link = imgur_fetcher.fetch('hoodie')
+        elif message.text == 'hentai':
+            link = imgur_fetcher.fetch('hentai')
 
+        if link is not None:
+            message.chat.send_message(link)
 
 def error(update, context):
     """Log Errors caused by Updates."""
