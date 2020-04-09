@@ -8,9 +8,9 @@ class HoodieFetcher:
         self.client = ImgurClient(client_id, client_secret)
 
 
-    def fetch(self, query):
+    def fetch(self):
         # do request to get albums
-        albums = self.client.gallery_search(query)
+        albums = self.client.gallery_search('hoodie')
 
         # if got at least one album, pick a random one and return link of first image
         if len(albums) > 0:
