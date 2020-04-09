@@ -1,12 +1,21 @@
-from configparser import ConfigParser
 from imgurpython import ImgurClient
+import random
 
-config = ConfigParser()
-config.read('./idcmk.ini')
 
-CLIENT_ID = config['imgur']['client_id']
-CLIENT_SECRET = config['imgur']['client_secret']
-client = ImgurClient(CLIENT_ID, CLIENT_SECRET)
+class HoodieFetcher:
 
-def image_fetch(query):
-    pass
+    def __init__(self, client_id, client_secret):
+        self.client = ImgurClient(client_id, client_secret)
+
+
+    def fetch(self, query):
+        # do request to get albums
+        albums = self.client.gallery_search(query)
+
+        # if got at least one album, pick a random one and return link of first image
+        if len(albums) > 0:
+            album = random.choice(albums)
+            if hasattr(album, 'images'):
+                # sometimes there are no images...
+                return album.images[0]['link']
+
