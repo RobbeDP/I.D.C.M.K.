@@ -1,26 +1,8 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# This program is dedicated to the public domain under the CC0 license.
-
-"""
-Simple Bot to reply to Telegram messages.
-First, a few handler functions are defined. Then, those functions are passed to
-the Dispatcher and registered at their respective places.
-Then, the bot is started and runs until we press Ctrl-C on the command line.
-Usage:
-Basic Echobot example, repeats messages.
-Press Ctrl-C on the command line or send a signal to the process to stop the
-bot.
-"""
-
 import logging
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
-
-from image_fetch import ImgurFetcher
-
+from image_fetch import ImgurFetcher, GoogleFetcher
 from configparser import ConfigParser
-
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -32,10 +14,17 @@ LOGGER = logging.getLogger(__name__)
 config = ConfigParser()
 config.read('../idcmk.ini')
 
-# Initialize hoodie fetcher
+# Initialize imgur fetcher
 CLIENT_ID = config['imgur']['client_id']
 CLIENT_SECRET = config['imgur']['client_secret']
 IMGUR_FETCHER = ImgurFetcher(CLIENT_ID, CLIENT_SECRET)
+
+# Initialise google fetcher
+API_KEY = config['google']['api_key']
+PROJECT_ID = config['google']['project_id']
+print(API_KEY)
+print(PROJECT_ID)
+GOOGLE_FETCHER = GoogleFetcher(API_KEY, PROJECT_ID)
 
 # Read in Telegram Bot Token
 BOT_TOKEN = config['telegram']['token']
@@ -73,7 +62,8 @@ def trui(update, context):
         query = MSG_TO_QUERY.get(text, None)  # gets None if nothing was found
 
         if query is not None:
-            link = IMGUR_FETCHER.fetch(query)
+            link = GOOGLE_FETCHER.fetch(query)
+            print(link)
             message.chat.send_message(link)
 
 def error(update, context):
@@ -112,4 +102,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
