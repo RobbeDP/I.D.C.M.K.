@@ -44,7 +44,13 @@ BOT_TOKEN = config['telegram']['token']
 # queries that will be used to fetch images.
 MSG_TO_QUERY = {
     'trui': 'hoodie',
-    'hentai': 'hentai'
+    'hentai': 'hentai',
+    'iets grappigs': 'funny'
+}
+
+# Intitialize blacklisted user set
+BLACKLISTED = {
+    'ManuDeBuck'
 }
 
 # Define a few command handlers. These usually take the two arguments update and
@@ -61,7 +67,7 @@ def help(update, context):
 
 def trui(update, context):
     message = update.message
-    if hasattr(message, 'text'):
+    if hasattr(message, 'text') and message.from_user.username not in BLACKLISTED:
         # sometimes doesn't have text lol
         text = message.text.lower()
         query = MSG_TO_QUERY.get(text, None)  # gets None if nothing was found
