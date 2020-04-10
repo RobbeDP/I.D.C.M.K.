@@ -26,19 +26,26 @@ from configparser import ConfigParser
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 
-logger = logging.getLogger(__name__)
+LOGGER = logging.getLogger(__name__)
 
 # Read in config file
 config = ConfigParser()
-config.read('./idcmk.ini')
+config.read('../idcmk.ini')
 
 # Initialize hoodie fetcher
 CLIENT_ID = config['imgur']['client_id']
 CLIENT_SECRET = config['imgur']['client_secret']
-imgur_fetcher = ImgurFetcher(CLIENT_ID, CLIENT_SECRET)
+IMGUR_FETCHER = ImgurFetcher(CLIENT_ID, CLIENT_SECRET)
 
 # Read in Telegram Bot Token
 BOT_TOKEN = config['telegram']['token']
+
+# Initialize responses dictionary. This dictionary maps messages to the corresponding
+# queries that will be used to fetch images.
+MSG_TO_QUERY = {
+    'trui': 'hoodie',
+    'hentai': 'hentai'
+}
 
 # Define a few command handlers. These usually take the two arguments update and
 # context. Error handlers also receive the raised TelegramError object in error.
@@ -55,18 +62,17 @@ def help(update, context):
 def trui(update, context):
     message = update.message
     if hasattr(message, 'text'):
-        link = None
-        if message.text == 'trui':
-            link = imgur_fetcher.fetch('hoodie')
-        elif message.text == 'hentai':
-            link = imgur_fetcher.fetch('hentai')
+        # sometimes doesn't have text lol
+        text = message.text.lower()
+        query = MSG_TO_QUERY.get(text, None)  # gets None if nothing was found
 
-        if link is not None:
+        if query is not None:
+            link = IMGUR_FETCHER.fetch(query)
             message.chat.send_message(link)
 
 def error(update, context):
     """Log Errors caused by Updates."""
-    logger.warning('Update "%s" caused error "%s"', update, context.error)
+    LOGGER.warning('Update "%s" caused error "%s"', update, context.error)
 
 
 def main():
