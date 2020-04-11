@@ -41,10 +41,10 @@ with open('json/blacklist.json') as file:
 # context. Error handlers also receive the raised TelegramError object in error.
 def help(update, context):
     """Send a message when the command /help is issued."""
-    update.message.reply_text('opbokken kut zoek het zelf maar uit')
+    update.message.reply_text('Opbokken kut, zoek het zelf maar uit.')
 
 
-def trui(update, context):
+def show_image_url(update, context):
     message = update.message
     if hasattr(message, 'text') and message.from_user.username not in black_list:
         # message sometimes doesn't have text
@@ -78,7 +78,7 @@ def main():
     dp.add_handler(CommandHandler("help", help))
 
     # on noncommand i.e message - echo the message on Telegram
-    dp.add_handler(MessageHandler(Filters.text, trui))
+    dp.add_handler(MessageHandler(Filters.text, show_image_url))
 
     # log all errors
     dp.add_error_handler(error)
