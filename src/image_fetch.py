@@ -18,6 +18,7 @@ class ImgurFetcher:
                 # sometimes there are no images...
                 return album.images[0]['link']
 
+# TODO
 class GoogleFetcher:
     def __init__(self, api_key, project_key):
         self.client = GoogleImagesSearch(api_key, project_key)
