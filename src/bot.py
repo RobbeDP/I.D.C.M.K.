@@ -2,7 +2,7 @@ import logging
 import json
 
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
-from image_fetch import ImgurFetcher, GoogleFetcher
+from image_fetch import ImgurFetcher, GoogleFetcher, LimitExceededError
 from configparser import ConfigParser
 
 # Enable logging
@@ -19,6 +19,11 @@ config.read('../idcmk.ini')
 CLIENT_ID = config['imgur']['client_id']
 CLIENT_SECRET = config['imgur']['client_secret']
 IMGUR_FETCHER = ImgurFetcher(CLIENT_ID, CLIENT_SECRET)
+
+# Initialize google fetcher
+API_KEY = config['google']['api_key']
+PROJECT_KEY = config['google']['project_key']
+GOOGLE_FETCHER = GoogleFetcher(API_KEY, PROJECT_KEY)
 
 # Read in Telegram Bot Token
 BOT_TOKEN = config['telegram']['token']
@@ -47,10 +52,12 @@ def trui(update, context):
         query = searches.get(text, None)  # gets None if nothing was found
 
         if query is not None:
-            link = IMGUR_FETCHER.fetch(query)
-            # response contains no link sometimes
-            while link == 'null':
+            # If google limit is exceed, switch to imgur
+            try:
+                link = GOOGLE_FETCHER.fetch(query)
+            except LimitExceededError:
                 link = IMGUR_FETCHER.fetch(query)
+
             message.chat.send_message(link)
 
 
