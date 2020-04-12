@@ -20,11 +20,6 @@ CLIENT_ID = config['imgur']['client_id']
 CLIENT_SECRET = config['imgur']['client_secret']
 IMGUR_FETCHER = ImgurFetcher(CLIENT_ID, CLIENT_SECRET)
 
-# Initialize google fetcher
-API_KEY = config['google']['api_key']
-PROJECT_KEY = config['google']['project_key']
-GOOGLE_FETCHER = GoogleFetcher(API_KEY, PROJECT_KEY)
-
 # Read in Telegram Bot Token
 BOT_TOKEN = config['telegram']['token']
 
@@ -33,9 +28,10 @@ BOT_TOKEN = config['telegram']['token']
 with open('json/search.json') as file:
     searches = json.load(file)
 
-# Intitialize blacklisted user set
-with open('json/blacklist.json') as file:
-    black_list = json.load(file)
+# Initialize blacklisted users set
+black_list = {
+
+}
 
 # Define a few command handlers. These usually take the two arguments update and
 # context. Error handlers also receive the raised TelegramError object in error.
@@ -52,11 +48,7 @@ def show_image_url(update, context):
         query = searches.get(text, None)  # gets None if nothing was found
 
         if query is not None:
-            # If google limit is exceed, switch to imgur
-            try:
-                link = GOOGLE_FETCHER.fetch(query)
-            except LimitExceededError:
-                link = IMGUR_FETCHER.fetch(query)
+            link = IMGUR_FETCHER.fetch(query)
 
             message.chat.send_message(link)
 
