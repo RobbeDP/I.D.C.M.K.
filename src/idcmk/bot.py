@@ -1,10 +1,10 @@
 import logging
 import json
+import random
 
 from configparser import ConfigParser
 from .image_fetch import ImgurFetcher
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
-
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -26,10 +26,14 @@ IMGUR_FETCHER = ImgurFetcher(CLIENT_ID, CLIENT_SECRET)
 with open('idcmk/json/search.json') as file:
     searches = json.load(file)
 
+with open('idcmk/json/question(re)marks.json') as file2:
+    remarks = json.load(file2)
+
 # Initialize blacklisted users set
 black_list = {
 
 }
+
 
 # Define a few command handlers. These usually take the two arguments update and
 # context. Error handlers also receive the raised TelegramError object in error.
@@ -40,15 +44,40 @@ def help(update, context):
 
 def show_image_url(update, context):
     message = update.message
-    if hasattr(message, 'text') and message.from_user.username not in black_list:
-        # message sometimes doesn't have text
-        text = message.text.lower()
-        query = searches.get(text, None)  # gets None if nothing was found
+    if hasattr(message, 'text'):
+        if message.from_user.username not in black_list:
+            # message sometimes doesn't have text
+            text = message.text.lower().strip()
+            query = searches.get(text, None)  # gets None if nothing was found
 
-        if query is not None:
-            link = IMGUR_FETCHER.fetch(query)
+            if query is not None:
+                link = IMGUR_FETCHER.fetch(query)
+                message.chat.send_message(link)
 
-            message.chat.send_message(link)
+                return True
+
+    return False
+
+
+def answer_question(update, context):
+    message = update.message
+    if message.from_user.username not in black_list:
+        text = message.text.lower().strip()
+        if text.endswith("?"):
+            for word in remarks:
+                if word in text:
+                    possible_remarks = remarks[word]
+                    message.reply_text(possible_remarks[random.randint(0, len(possible_remarks) - 1)])
+                    return True
+
+    return False
+
+
+def text_handler(update, context):
+    if show_image_url(update, context):
+        return
+    elif answer_question(update, context):
+        return
 
 
 def error(update, context):
@@ -67,16 +96,11 @@ def run():
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("help", help))
 
-    # on noncommand i.e message - echo the message on Telegram
-    dp.add_handler(MessageHandler(Filters.text, show_image_url))
+    # on noncommand i.e message
+    dp.add_handler(MessageHandler(Filters.text, text_handler))
 
     # log all errors
     dp.add_error_handler(error)
 
     # Start the Bot
     updater.start_polling()
-
-    # Run the bot until you press Ctrl-C or the process receives SIGINT,
-    # SIGTERM or SIGABRT. This should be used most of the time, since
-    # start_polling() is non-blocking and will stop the bot gracefully.
-    updater.idle()
