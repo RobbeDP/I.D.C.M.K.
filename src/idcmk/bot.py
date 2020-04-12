@@ -1,9 +1,10 @@
 import logging
 import json
 
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
-from image_fetch import ImgurFetcher, GoogleFetcher, LimitExceededError
 from configparser import ConfigParser
+from .image_fetch import ImgurFetcher
+from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -20,12 +21,9 @@ CLIENT_ID = config['imgur']['client_id']
 CLIENT_SECRET = config['imgur']['client_secret']
 IMGUR_FETCHER = ImgurFetcher(CLIENT_ID, CLIENT_SECRET)
 
-# Read in Telegram Bot Token
-BOT_TOKEN = config['telegram']['token']
-
 # Initialize responses dictionary. This dictionary maps messages to the corresponding
 # queries that will be used to fetch images.
-with open('json/search.json') as file:
+with open('idcmk/json/search.json') as file:
     searches = json.load(file)
 
 # Initialize blacklisted users set
@@ -37,7 +35,7 @@ black_list = {
 # context. Error handlers also receive the raised TelegramError object in error.
 def help(update, context):
     """Send a message when the command /help is issued."""
-    update.message.reply_text('Opbokken kut, zoek het zelf maar uit.')
+    update.message.chat.send_message('Opbokken kut, zoek het zelf maar uit.')
 
 
 def show_image_url(update, context):
@@ -58,10 +56,10 @@ def error(update, context):
     LOGGER.warning('Update "%s" caused error "%s"', update, context.error)
 
 
-def main():
+def run():
     """Start the bot."""
     # Create the Updater and pass it your bot's token.
-    updater = Updater(BOT_TOKEN, use_context=True)
+    updater = Updater(config['telegram']['token'], use_context=True)
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
@@ -82,7 +80,3 @@ def main():
     # SIGTERM or SIGABRT. This should be used most of the time, since
     # start_polling() is non-blocking and will stop the bot gracefully.
     updater.idle()
-
-
-if __name__ == '__main__':
-    main()
