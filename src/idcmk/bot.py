@@ -62,7 +62,7 @@ def show_image_url(update, context):
 def answer_question(update, context):
     message = update.message
     if message.from_user.username not in black_list:
-        text = message.text.lower().strip()
+        text = message.text.lower().strip().split(" ")
         if text.endswith("?"):
             for word in remarks:
                 if word in text:
