@@ -45,12 +45,16 @@ def show_image_url(update, context):
     if hasattr(message, 'text') and message.from_user.username not in black_list:
         # message sometimes doesn't have text
         text = message.text.lower()
-        query = searches.get(text, None)  # gets None if nothing was found
 
-        if query is not None:
-            link = IMGUR_FETCHER.fetch(query)
+        if text == "same":
+            message.chat.send_message("same")
+        else:
+            query = searches.get(text, None)  # gets None if nothing was found
 
-            message.chat.send_message(link)
+            if query is not None:
+                link = IMGUR_FETCHER.fetch(query)
+
+                message.chat.send_message(link)
 
 
 def error(update, context):
