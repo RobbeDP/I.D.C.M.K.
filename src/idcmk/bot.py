@@ -4,7 +4,7 @@ import random
 
 from configparser import ConfigParser
 from .image_fetch import ImgurFetcher
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+from telegram.ext import Updater, MessageHandler, Filters
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
