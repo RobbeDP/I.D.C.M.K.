@@ -26,62 +26,53 @@ IMGUR_FETCHER = ImgurFetcher(CLIENT_ID, CLIENT_SECRET)
 with open('idcmk/json/search.json') as file:
     searches = json.load(file)
 
-with open('idcmk/json/question(re)marks.json') as file2:
-    remarks = json.load(file2)
+with open('idcmk/json/question(re)marks.json') as file:
+    remarks = json.load(file)
 
 # Initialize blacklisted users set
-black_list = {
-
-}
+black_list = {}
 
 
-# Define a few command handlers. These usually take the two arguments update and
-# context. Error handlers also receive the raised TelegramError object in error.
-def help(update, context):
-    """Send a message when the command /help is issued."""
-    update.message.chat.send_message('Opbokken kut, zoek het zelf maar uit.')
-
-
-def show_image_url(update, context):
+def answer_text(update, context):
     message = update.message
-    if hasattr(message, 'text'):
-        if message.from_user.username not in black_list:
-            # message sometimes doesn't have text
-            text = message.text.lower().strip()
+    if hasattr(message, "text") and message.from_user.username not in black_list:
+        # message sometimes doesn't have text
+        text = message.text.lower().strip()
 
-            if text == "same":
-                message.chat.send_message("same")
-            else:
-                query = searches.get(text, None)  # gets None if nothing was found
-
-                if query is not None:
-                    link = IMGUR_FETCHER.fetch(query)
-                    message.chat.send_message(link)
-
-                    return True
-
-    return False
+        if text == "same":
+            message.chat.send_message("same")
 
 
-def answer_question(update, context):
+def answer_image_url(update, context):
     message = update.message
-    if message.from_user.username not in black_list:
-        text = message.text.lower().strip().split(" ")
-        if text.endswith("?"):
-            for word in remarks:
-                if word in text:
-                    possible_remarks = remarks[word]
-                    message.reply_text(possible_remarks[random.randint(0, len(possible_remarks) - 1)])
-                    return True
+    if hasattr(message, "text") and message.from_user.username not in black_list:
+        # message sometimes doesn't have text
+        text = message.text.lower().strip()
 
-    return False
+        queries = searches.get(text, None)  # gets None if nothing was found
+        if queries is not None:
+            query = random.choice(queries)
+            link = IMGUR_FETCHER.fetch(query)
+            message.chat.send_message(link)
+
+
+# def answer_question(update, context):
+#     message = update.message
+#     if message.from_user.username not in black_list:
+#         text = message.text.lower().strip().split(" ")
+#         if text.endswith("?"):
+#             for word in remarks:
+#                 if word in text:
+#                     possible_remarks = remarks[word]
+#                     message.reply_text(possible_remarks[random.randint(0, len(possible_remarks) - 1)])
+#                     return True
+#
+#     return False
 
 
 def text_handler(update, context):
-    if show_image_url(update, context):
-        return
-    elif answer_question(update, context):
-        return
+    answer_text(update, context)
+    answer_image_url(update, context)
 
 
 def error(update, context):
@@ -97,10 +88,7 @@ def run():
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
 
-    # on different commands - answer in Telegram
-    dp.add_handler(CommandHandler("help", help))
-
-    # on noncommand i.e message
+    # on message
     dp.add_handler(MessageHandler(Filters.text, text_handler))
 
     # log all errors

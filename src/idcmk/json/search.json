@@ -1,6 +1,7 @@
 {
-    "trui": "hoodie",
-    "hentai": "hentai",
-    "grap": "funny",
-    "ansjovis": "fish"
+    "trui": ["hoodie", "sweater"],
+    "hentai": ["hentai"],
+    "grap": ["funny"],
+    "ansjovis": ["fish"],
+    "jas": ["jacket", "coat"]
 }
