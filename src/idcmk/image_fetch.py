@@ -10,9 +10,10 @@ class ImgurFetcher:
         # do request to get albums
         albums = self.client.gallery_search(query)
 
-        # if got at least one album, pick a random one and return link of first image
+        # if got at least one album, pick a random one and return link of random image
         if len(albums) > 0:
             album = random.choice(albums)
             if hasattr(album, 'images') and len(album.images) > 0:
-                # sometimes there are no images...
-                return album.images[0]['link']
+                index = random.randint(0, len(album.images) - 1)
+                # TODO sometimes link is null
+                return album.images[index]['link']
