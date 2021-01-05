@@ -9,5 +9,6 @@
     "luis": ["bottle"],
     "haha": ["laughing", "smiling"],
     "hahaha": ["laughing", "smiling"],
-    "hahahaha": ["laughing", "smiling"]
+    "hahahaha": ["laughing", "smiling"],
+    "manus": ["sombrero"]
 }
