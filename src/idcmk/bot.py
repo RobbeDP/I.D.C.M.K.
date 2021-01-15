@@ -48,13 +48,15 @@ def answer_image_url(update, context):
     if hasattr(message, "text") and message.from_user.username not in black_list:
         # message sometimes doesn't have text
         text = message.text.lower().strip()
-
-        queries = searches.get(text, None)  # gets None if nothing was found
-        if queries is not None:
-            query = random.choice(queries)
-            link = IMGUR_FETCHER.fetch(query)
-            message.chat.send_message(link)
-
+        
+        if text == "piemel":
+            message.chat.send_message("https://imgur.com/a/ibmP6vH")
+        else:
+            queries = searches.get(text, None)  # gets None if nothing was found
+            if queries is not None:
+                query = random.choice(queries)
+                link = IMGUR_FETCHER.fetch(query)
+                message.chat.send_message(link)
 
 # def answer_question(update, context):
 #     message = update.message
