@@ -50,7 +50,7 @@ def answer_image_url(update, context):
         text = message.text.lower().strip()
         
         if text == "piemel":
-            message.chat.send_message("https://imgur.com/a/ibmP6vH")
+            message.chat.send_message("https://i.imgur.com/n4ZS4m6.png")
         else:
             queries = searches.get(text, None)  # gets None if nothing was found
             if queries is not None:
